@@ -1,0 +1,31 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "extends": ["prettier", "plugin:node/recommended", "plugin:json/recommended"],
+  "plugins": ["prettier"],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 11,
+    "sourceType": "module"
+  },
+  "rules": {
+    "prettier/prettier": "warn",
+    "linebreak-style": "off",
+    "no-unused-vars": "warn",
+    "no-plusplus": "off",
+    "spaced-comment": "off",
+    "func-names": "off",
+    "object-shorthand": "off",
+    "no-param-reassign": ["error", { "props": false }],
+    "node/no-unsupported-features/es-syntax": "off",
+    "quotes": ["warn", "single"],
+    "semi": ["error", "always", {"omitLastInOneLineBlock": true}],
+    "node/no-unpublished-require": "off"
+  }
+}
