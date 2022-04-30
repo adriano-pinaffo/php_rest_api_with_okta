@@ -14,7 +14,7 @@ PUT /person/{id}
 DELETE /person/{id}
 
 
-Cient cURL:
+Cient in cURL:
 Find user
 $ curl -X GET  http://127.0.0.1:8000/person/2
 [{"id":"2","firstname":"Maria","lastname":"Hristozova","firstparent_id":null,"secondparent_id":null}]

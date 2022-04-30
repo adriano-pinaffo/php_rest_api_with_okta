@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test of PHP Rest API using forms only</title>
+  <style>
+body {
+  padding: 16px;
+  height: 95vh;
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: space-evenly;
+  column-gap: 16px;
+}
+
+#ifresult {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4) inset;
+  flex-grow: 8;
+}
+
+h3 {
+  margin-top: 0;
+}
+
+form {
+  background: linear-gradient(150deg, rgb(220, 220, 220), rgb(160, 160, 160));
+  padding: 8px;
+}
+
+fieldset {
+  background: rgb(240, 240, 240);
+  border: none;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  margin-bottom: 16px;
+}
+
+legend {
+  background: rgb(240, 240, 240);
+  border-radius: 4px;
+  padding: 0 8px;
+}
+
+form input[type=submit],
+form input[type=button] {
+  background: rgb(240, 240, 240);
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  padding: 0 8px;
+  font-weight: bold;
+  text-align: center;
+}
+  </style>
+</head>
+<body>
+  <h3>Get all Users</h3>
+  <form id="formGetall" action="http://127.0.0.1:8000/person/" target="ifresult">
+    <input type="submit">
+    <input type="button" value="clear" onclick="(function() { document.getElementById('ifresult').src='about:blank' })()">
+  </form>
+  <h3>Get user ID</h3>
+  <form id="formGetId" action="http://127.0.0.1:8000/person/" target="ifresult">
+    <fieldset>
+      <legend>ID</legend>
+      <div>
+        <label for="idGetId">ID: </label>
+        <input id="idGetId" type="number" placeholder="Enter ID here"
+          oninput="(function() { formGetId.action = divUrl.dataset.url + idGetId.value; })()">
+        <span>0 or empty for all</span>
+      </div>
+    </fieldset>
+    <input type="submit">
+    <input type="button" value="clear" onclick="(function() { document.getElementById('ifresult').src='about:blank' })()">
+  </form>
+  <h3>Add user</h3>
+  <form id="formAdd" action="http://127.0.0.1:8000/person/" method="post" target="ifresult">
+    <fieldset>
+      <legend>Input</legend>
+      <div>
+        <label for="add-firstname">First name: </label>
+        <input id="add-firstname" type="text" name="firstname" placeholder="Enter first name" required>
+        <span>*</span>
+      </div>
+      <div>
+        <label for="add-lastname">Last name: </label>
+        <input id="add-lastname" type="text" name="lastname" placeholder="Enter last name" required>
+        <span>*</span>
+      </div>
+      <div>
+        <label for="add-firstparent_id">First parent ID: </label>
+        <input id="add-firstparent_id" type="number" name="firstparent_id" placeholder="Enter the ID from the first parent">
+        <span></span>
+      </div>
+      <div>
+        <label for="add-secondparent_id">Second parent ID: </label>
+        <input id="add-secondparent_id" type="number" name="secondparent_id" placeholder="Enter the ID from the second parent">
+        <span></span>
+      </div>
+    </fieldset>
+    <input type="submit">
+    <input type="button" value="clear" onclick="(function() { document.getElementById('ifresult').src='about:blank' })()">
+  </form>
+  <h3>Update user</h3>
+  <form id="formUpdate" action="http://127.0.0.1:8000/person/" method="post" target="ifresult">
+    <fieldset>
+      <legend>ID</legend>
+      <div>
+        <label for="idUpdate">ID: </label>
+        <input id="idUpdate" type="number" placeholder="Enter ID here" required
+          oninput="(function() { formUpdate.action = divUrl.dataset.url + idUpdate.value; })()">
+        <span>*</span>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Input</legend>
+      <div>
+        <label for="upd-firstname">First name: </label>
+        <input id="upd-firstname" type="text" name="firstname" placeholder="Enter first name" required>
+        <span>*</span>
+      </div>
+      <div>
+        <label for="upd-lastname">Last name: </label>
+        <input id="upd-lastname" type="text" name="lastname" placeholder="Enter last name" required>
+        <span>*</span>
+      </div>
+      <div>
+        <label for="upd-firstparent_id">First parent ID: </label>
+        <input id="upd-firstparent_id" type="number" name="firstparent_id" placeholder="Enter the ID from the first parent">
+        <span></span>
+      </div>
+      <div>
+        <label for="upd-secondparent_id">Second parent ID: </label>
+        <input id="upd-secondparent_id" type="number" name="secondparent_id" placeholder="Enter the ID from the second parent">
+        <span></span>
+      </div>
+    </fieldset>
+    <input style="display: none" id="upd-method" type="text" name="method" value="put">
+    <input type="submit">
+    <input type="button" value="clear" onclick="(function() { document.getElementById('ifresult').src='about:blank' })()">
+  </form>
+  <h3>Delete user ID</h3>
+  <form id="formDelete" action="http://127.0.0.1:8000/person/" method="post" target="ifresult">
+    <fieldset>
+      <legend>ID</legend>
+      <div>
+        <label for="idDelete">ID: </label>
+        <input id="idDelete" type="number" placeholder="Enter ID here" required
+          oninput="(function() { formDelete.action = divUrl.dataset.url + idDelete.value; })()">
+        <span>*</span>
+      </div>
+    </fieldset>
+    <input style="display: none" id="del-method" type="text" name="method" value="delete">
+    <input type="submit">
+    <input type="button" value="clear" onclick="(function() { document.getElementById('ifresult').src='about:blank' })()">
+  </form>
+  <iframe id="ifresult" name="ifresult" src="about:blank" frameborder="0"></iframe>
+  <div id="divUrl" data-url="http://127.0.0.1:8000/person/" style="display: none"></div>
+</body>
+</html>

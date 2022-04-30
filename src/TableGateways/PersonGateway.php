@@ -5,6 +5,10 @@ class PersonGateway {
   private $db = null;
 
   public function __construct($db) {
+    // logger
+    global $log;
+    $this->log = $log;
+
     $this->db = $db;
   }
 
@@ -55,6 +59,7 @@ class PersonGateway {
   }
 
   public function update($id, Array $input) {
+    //$this->log->warning('input', $input);
     $statement = "
     UPDATE person SET
       firstname = :firstname,

@@ -1,6 +1,9 @@
 <?php
-require "../bootstrap.php";
 use Src\Controller\PersonController;
+require "../bootstrap.php";
+$dir = __DIR__ . '/../';
+require __DIR__ . '/../src/Logger/logger.php';
+//$log->warning('Start in index.php');
 
 // run from root folder as:
 // $ php -S 127.0.0.1:8000 -t public
