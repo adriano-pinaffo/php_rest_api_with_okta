@@ -37,6 +37,7 @@ class PersonGateway {
   }
 
   public function insert(Array $input) {
+    //$this->log->warning('insert-input', $input);
     $statement = "
     INSERT INTO person
       (firstname, lastname, firstparent_id, secondparent_id)
@@ -59,7 +60,7 @@ class PersonGateway {
   }
 
   public function update($id, Array $input) {
-    //$this->log->warning('input', $input);
+    //$this->log->warning('update-input', $input);
     $statement = "
     UPDATE person SET
       firstname = :firstname,

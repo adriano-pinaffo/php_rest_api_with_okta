@@ -28,7 +28,7 @@ class PersonController {
         $response = $this->getAllUsers();
       break;
     case 'POST':
-      //$this->log->warning('del', $_POST);
+      //$this->log->warning('post', $_POST);
       if (array_key_exists('method', $_POST)) {
         if ($_POST['method'] == 'put')
           $response = $this->updateUser($this->userId);
@@ -70,22 +70,20 @@ class PersonController {
 
   private function addUser() {
     $contentType = $_SERVER['HTTP_CONTENT_TYPE'];
-    //$this->log->warning('addUser', ['content' => $contentType]);
+    //$this->log->warning('post', $_POST);
     //$input = $_POST;
     // https://www.php.net/manual/en/wrappers.php.php#wrappers.php.input
     // data to be sent as json
     // in Postman the body must be raw and JSON
     // in cURL the header is "Content-Type: application/json" and data is json format '{"value": "key"}'
-    if ($contentType == 'application/json') {
+    if (preg_match("/application\/json/", $contentType)) {
       $input = (array) json_decode(file_get_contents('php://input'), TRUE);
       //$this->log->warning('input', $input);
     } elseif ($contentType == 'application/x-www-form-urlencoded') {
       $input = $_POST;
       //$this->log->warning('POST', $input);
     } else {
-      $response['status_code_header'] = 'HTTP/1.1 415 Unsupported Media Type';
-      $response['body'] = json_encode(['HTTP_CONTENT_TYPE' => $contentType]);
-      return $response;
+      return unsupportedMedia();
     }
 
     $input = $this->adjustInput($input);
@@ -101,14 +99,13 @@ class PersonController {
 
   private function updateUser($id) {
     $contentType = $_SERVER['HTTP_CONTENT_TYPE'];
-    if ($contentType == 'application/json') {
+    if (preg_match("/application\/json/", $contentType)) {
       $input = (array) json_decode(file_get_contents('php://input'), TRUE);
+      $this->log->warning('input', $input);
     } elseif ($contentType == 'application/x-www-form-urlencoded') {
       $input = $_POST;
     } else {
-      $response['status_code_header'] = 'HTTP/1.1 415 Unsupported Media Type';
-      $response['body'] = json_encode(['HTTP_CONTENT_TYPE' => $contentType]);
-      return $response;
+      return unsupportedMedia();
     }
 
     $input = $this->adjustInput($input);
@@ -168,6 +165,12 @@ class PersonController {
   private function unprocessablePerson() {
     $response['status_code_header'] = 'HTTP/1.1 422 Unprocessable Entity';
     $response['body'] = json_encode(['error' => 'Invalid input']);
+    return $response;
+  }
+
+  private function unsupportedMedia() {
+    $response['status_code_header'] = 'HTTP/1.1 415 Unsupported Media Type';
+    $response['body'] = json_encode(['HTTP_CONTENT_TYPE' => $contentType]);
     return $response;
   }
 }

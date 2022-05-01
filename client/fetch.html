@@ -256,16 +256,16 @@ body > div:not([id]) {
       }
 
       function loadOptions(method) {
-        let body = {
+        const body = {
           firstname: firstname.value,
           lastname: lastname.value,
           firstparent_id: firstparent_id.value,
           secondparent_id: secondparent_id.value,
         }
-        let headers = {
+        const headers = {
           'Content-Type': 'application/json',
         }
-        let options = {
+        const options = {
           method: method,
           headers: headers,
           body: JSON.stringify(body),
