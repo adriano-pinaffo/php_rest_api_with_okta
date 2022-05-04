@@ -83,7 +83,7 @@ class PersonController {
       $input = $_POST;
       //$this->log->warning('POST', $input);
     } else {
-      return unsupportedMedia();
+      return $this->unsupportedMedia();
     }
 
     $input = $this->adjustInput($input);
@@ -105,7 +105,7 @@ class PersonController {
     } elseif ($contentType == 'application/x-www-form-urlencoded') {
       $input = $_POST;
     } else {
-      return unsupportedMedia();
+      return $this->unsupportedMedia();
     }
 
     $input = $this->adjustInput($input);
