@@ -16,11 +16,15 @@ body > * {
 form {
   margin: 50px auto;
   padding: 32px;
-  max-width: 800px;
+  max-width: 790px;
   background: linear-gradient(150deg, rgb(220, 220, 220), rgb(160, 160, 160));
   display: grid;
   grid-template-columns: repeat(var(--nr-columns), 1fr);
   grid-gap: 1.5rem 0.5rem;
+}
+
+form > * {
+  overflow: hidden;
 }
 
 form > input[type=radio] {
@@ -59,7 +63,31 @@ form input[type=submit] {
   grid-column: 1 / 3;
 }
 
-form input[type=button] {
+form #iptUrl {
+  grid-column: 3 / span 2;
+}
+
+form #iptClientId {
+  grid-column: 5 / span 2;
+}
+
+form #iptSecret {
+  grid-column: 7 / span 2;
+}
+
+form #iptScope {
+  grid-column: 9 / span 2;
+}
+
+form #fileDiv {
+  grid-column: 11 / span 2;
+}
+
+form #token {
+  grid-column: 13 / span 2;
+}
+
+form #clear {
   grid-column: -3 / -1;
 }
 
@@ -72,6 +100,14 @@ form input[type=button] {
   padding: 8px 0;
   font-weight: bold;
   text-align: center;
+}
+
+form input[type=text],
+form input[type=number],
+form input[type=password] {
+  border-radius: 8px;
+  border: 1px solid gray;
+  outline: none;
 }
 
 body > div:not([id]) {
@@ -183,6 +219,15 @@ body > div:not([id]) {
       </div>
     </fieldset>
     <input type="submit">
+    <input id="iptUrl" type="text" name="url" placeholder="Enter Issuer URL">
+    <input id="iptClientId" type="text" name="clientId" placeholder="Enter Client ID">
+    <input id="iptSecret" type="password" name="secret" placeholder="Enter Secret">
+    <input id="iptScope" type="text" name="scope" placeholder="Enter Scope">
+    <div id="fileDiv">
+      <div id="loadFileText">Or load .env</div>
+      <input id="fileItem" type="file">
+    </div>
+    <input type="button" id="token" value="Get token">
     <input type="button" id="clear" value="clear">
   </form>
   <div>Status:</div>
@@ -198,7 +243,59 @@ body > div:not([id]) {
       divStatus.textContent = 'Connecting';
 
       let {url, options} = getOptions();
+      getData(url, options);
+    }
 
+    clear.onclick = function() {
+      let inputs = document.querySelectorAll('form input[type=text],form input[type=password],form input[type=number]');
+      inputs.forEach(input => input.value = '');
+      getall.click();
+      cleanResult();
+      divStatus.textContent = 'Idle';
+      delete divStatus.dataset.ok;
+    }
+
+    async function getToken() {
+      const clientKey = iptClientId.value;
+      const clientSecret = iptSecret.value;
+      const clientScope = iptScope.value;
+      const clientUrl = iptUrl.value.match(/\/v1\/token$/) ?
+        iptUrl.value :
+        iptUrl.value.replace(/\/$/, '') + '/v1/token';
+      const payload = `grant_type=client_credentials&scope=${clientScope}`;
+      const token = btoa(clientKey + ':' + clientSecret);
+      const options = {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${token}`,
+          // Origin: yourdomain, will be added by the browser here, causing
+        },
+        body: payload,
+      };
+      try {
+        const proxyFetch = getProxyFetch(clientUrl, options);
+        const result = await proxyFetch()
+        <!--const result = await fetch(clientUrl, options);-->
+        if (result.ok && result.status >= 200 & result.status < 300) {
+          const json = await result.json();
+          for ([name, value] of Object.entries(json))
+            iptUrl.dataset[name] = value;
+          divStatus.textContent = 'Bearer token loaded!';
+        } else {
+          throw new Error('Could not fetch token. CORS? (' + result['status'] + ' ' + result['statusText'] + ')');
+        }
+      } catch (err) {
+        divStatus.textContent = err;
+      }
+    }
+
+    function getProxyFetch(url, options) {
+      options.url = url;
+      return fetch.bind(null, 'http://127.0.0.1:8001', {method: 'post', body: JSON.stringify(options), headers: {'Content-Type': 'application/json'}});
+    }
+
+    function getData(url, options) {
       fetch(url, options)
         .then(res => {
           if (res.ok && res.status >= 200 & res.status < 300) {
@@ -227,22 +324,16 @@ body > div:not([id]) {
         })
     }
 
-    clear.onclick = function() {
-      cleanResult();
-      divStatus.textContent = 'Idle';
-      delete divStatus.dataset.ok;
-    }
-
     function getOptions() {
       let command = Array.from(document.querySelectorAll('input[name=commandRadio]')).filter(cmd => cmd.checked)[0].id;
       let url = form.action;
       let options = null;
       switch(command){
         case 'getall':
-          return {url: url, options: {}};
         case 'getid':
+          options = loadOptions('get');
           url = url + (id.value ? id.value : '');
-          return {url: url, options: {}};
+          return {url: url, options: options};
         case 'add':
           options = loadOptions('post');
           return {url: url, options: options};
@@ -251,8 +342,9 @@ body > div:not([id]) {
           options = loadOptions('put');
           return {url: url, options: options};
         case 'delete':
-          url = url + (id.value ? id.value : '');
-          return {url: url, options: {method: 'delete'}};
+          options = loadOptions('delete');
+          url = url + id.value;
+          return {url: url, options: options};
       }
 
       function loadOptions(method) {
@@ -264,14 +356,48 @@ body > div:not([id]) {
         }
         const headers = {
           'Content-Type': 'application/json',
+          // Authorization header causes pre-flight to be sent
+          Authorization: `${iptUrl.dataset['token_type']} ${iptUrl.dataset['access_token']}`,
         }
-        const options = {
-          method: method,
-          headers: headers,
-          body: JSON.stringify(body),
-        }
+        const options = {method: method, headers: headers,};
+        if (!method.match(/get|delete/))
+          options.body = JSON.stringify(body);
         return options;
       }
+    }
+
+    fileItem.onchange = () => {
+      iptClientId.value = '';
+      iptSecret.value = '';
+      if (fileItem.files.length > 0) {
+        const file = fileItem.files[0];
+        const reader = new FileReader();
+        reader.readAsText(fileItem.files[0]);
+        reader.onload = evt => {
+          const text = evt.target.result;
+          const arr = text.split('\n');
+          let obj = {};
+          arr.forEach(row => obj[row.replace(/=.*$/, '')] = row.replace(/^.*=/, ''));
+          if ('OKTAISSUER' in obj)
+            iptUrl.value = obj['OKTAISSUER'];
+          if ('OKTACLIENTID' in obj)
+            iptClientId.value = obj['OKTACLIENTID'];
+          if ('OKTASECRET' in obj)
+            iptSecret.value = obj['OKTASECRET'];
+          if ('SCOPE' in obj)
+            iptScope.value = obj['SCOPE'];
+          fileItem.value = '';
+          if (iptUrl.value && iptClientId.value && iptSecret.value && iptScope.value && iptUrl.value)
+            divStatus.textContent = 'Key and Secret loaded';
+          else
+            divStatus.textContent = 'Failed to load Key and Secret successfuly';
+        };
+        reader.onerror = () => divStatus.textContent = 'Error loading file!';
+      }
+    }
+
+    token.onclick = () => {
+      getToken();
     }
 
     function renderResult(json) {

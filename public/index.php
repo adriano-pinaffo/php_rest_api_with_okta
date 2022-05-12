@@ -1,12 +1,28 @@
 <?php
 use Src\Controller\PersonController;
 require "../bootstrap.php";
-$dir = __DIR__ . '/../';
 require __DIR__ . '/../src/Logger/logger.php';
-//$log->warning('Start in index.php');
+//$log->warning('SERVER', $_SERVER);
 
 // run from root folder as:
 // $ php -S 127.0.0.1:8000 -t public
+
+const ALLOWED_ORIGIN = array('http://localhost:3000');
+$method = $_SERVER['REQUEST_METHOD'];
+$headers = array_filter($_SERVER, function($item) {
+    return preg_match('/^HTTP_/', $item);
+}, ARRAY_FILTER_USE_KEY);
+
+if (isPreflight() && isset($_SERVER['HTTP_ORIGIN'])) {
+    if (!in_array($_SERVER['HTTP_ORIGIN'], ALLOWED_ORIGIN))
+        header('HTTP/1.1 401 Unauthorized');
+    header('HTTP/1.1 200 OK');
+    header("Access-Control-Allow-Origin: $_SERVER[HTTP_ORIGIN]");
+    header("Access-Control-Allow-Methods: OPTIONS, GET, POST, PUT, DELETE");
+    header('Access-Control-Allow-Headers: content-type, authorization');
+    header("Access-Control-Max-Age: 3600");
+    return;
+}
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -67,5 +83,16 @@ function authenticate() {
   } catch (\Exception $e) {
     return false;
   }
+}
+
+function isPreflight() {
+    global $method, $headers;
+
+    if (!($method == 'OPTIONS' && isset(
+        $headers['HTTP_ACCESS_CONTROL_REQUEST_METHOD'],
+        $headers['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'],
+        $headers['HTTP_ORIGIN'])))
+        return false;
+    return true;
 }
 ?>

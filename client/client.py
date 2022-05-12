@@ -25,29 +25,19 @@ $ python client.py deleteuser 89
 import requests
 import sys
 import json
+from get_token import Token
+
+token = Token().get_token()
 
 url = 'http://127.0.0.1:8000/person'
-
-def getAllUsers():
-    # resp = requests.post(url, data=params.data, headers=params.headers, timeout=5)
-    resp = requests.get(url, timeout=5)
-    if (not(resp.status_code >= 200 and resp.status_code < 300)):
-        print(f'Error: {resp.status_code} ({resp.reason})')
-        sys.exit(1)
-        # raise ConnectionError
-    jsonpy = resp.json()
-    # print_python_object(jsonpy) # print this for python object
-    # print_json(jsonpy) # print this for json format
-
-    table = prepare_table(jsonpy)
-    # print_table(table) # print this for 2 dimensional array
-
-    print_csv(table) # print below for comma-sepparated values
 
 def getUser(id):
     global url
     url += f'/{id}'
-    resp = requests.get(url, timeout=5)
+    headers = {
+        'Authorization': token,
+    }
+    resp = requests.get(url, headers=headers, timeout=5)
     if (not(resp.status_code >= 200 and resp.status_code < 300)):
         print(f'Error: {resp.status_code} ({resp.reason})')
         sys.exit(1)
@@ -64,6 +54,7 @@ def getUser(id):
 def addUser():
     headers = {
         'Content-Type': 'application/json;charset=utf-8',
+        'Authorization': token,
     }
     data = sys.argv[2]
     resp = requests.post(url, data=data, headers=headers, timeout=5)
@@ -80,6 +71,7 @@ def updateUser(id):
     url += f'/{id}'
     headers = {
         'Content-Type': 'application/json;charset=utf-8',
+        'Authorization': token,
     }
     data = sys.argv[3]
     resp = requests.put(url, data=data, headers=headers, timeout=5)
@@ -94,7 +86,10 @@ def updateUser(id):
 def deleteUser(id):
     global url
     url += f'/{id}'
-    resp = requests.delete(url, timeout=5)
+    headers = {
+        'Authorization': token,
+    }
+    resp = requests.delete(url, headers=headers, timeout=5)
     if (not(resp.status_code >= 200 and resp.status_code < 300)):
         print(f'Error: {resp.status_code} ({resp.reason})')
         sys.exit(1)
@@ -135,14 +130,12 @@ def print_csv(table):
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('No command passed')
-        print('command = getallusers|getuser|adduser|updateuser|deleteuser')
+        print('Command = getallusers|getuser|adduser|updateuser|deleteuser')
         sys.exit(1)
 
     command = sys.argv[1]
     id = sys.argv[2] if len(sys.argv) > 2 else ''
-    if command == 'getallusers':
-        getAllUsers()
-    elif command == 'getuser':
+    if command == 'getallusers' or command == 'getuser':
         getUser(id)
     elif command == 'adduser':
         addUser()

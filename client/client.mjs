@@ -25,8 +25,10 @@ $ node client.mjs deleteuser 89
 import fetch from 'node-fetch';
 import { argv } from 'process';
 import { exit } from 'process';
+import { Token } from './get_token.mjs';
 
 // getallusers|getuser|adduser|updateuser|deleteuser
+const tokenObj = new Token();
 
 let url = 'http://127.0.0.1:8000/person';
 const command = argv[2];
@@ -55,6 +57,7 @@ switch (command) {
     break;
   default:
     console.log('Command not found!');
+    console.log('Command = getallusers|getuser|adduser|updateuser|deleteuser');
     exit(1);
 }
 
@@ -84,14 +87,16 @@ async function fetchdelete(id) {
 }
 
 async function fetchapi(url, method, input) {
-  const options = loadOptions(method, input);
+  const token = await tokenObj.getTokenAsync();
+  const options = loadOptions(method, token, input);
   const response = await fetch(url, options);
   if (!(response.status >= 200 && response.status < 300)) {
     console.log(`Error: ${response.status} (${response.statusText})`);
     exit(1);
   }
   const data = await response.json();
-  console.log(`Status code: ${response.status} (${response.statusText})`);
+  if (method.toLowerCase() != 'get')
+    console.log(`Status code: ${response.status} (${response.statusText})`);
   return data;
 }
 
@@ -125,9 +130,10 @@ function printCsv(data) {
   });
 }
 
-function loadOptions(method, input) {
+function loadOptions(method, token, input) {
   const headers = {
     'Content-Type': 'application/json',
+    Authorization: token,
   };
   const options = {
     method: method,

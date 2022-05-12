@@ -101,7 +101,7 @@ class PersonController {
     $contentType = $_SERVER['HTTP_CONTENT_TYPE'];
     if (preg_match("/application\/json/", $contentType)) {
       $input = (array) json_decode(file_get_contents('php://input'), TRUE);
-      $this->log->warning('input', $input);
+      //$this->log->warning('input', $input);
     } elseif ($contentType == 'application/x-www-form-urlencoded') {
       $input = $_POST;
     } else {

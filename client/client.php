@@ -23,6 +23,9 @@
 // To delete a user:
 // $ php client.php deleteuser 7
 
+require('get_token.php');
+use TokenNS\Token;
+
 if ($_SERVER['argc'] == 1) {
   echo "Not enough options\n";
   showHelp();
@@ -30,7 +33,17 @@ if ($_SERVER['argc'] == 1) {
 }
 
 $command = $_SERVER['argv'][1];
+
 $ch = curl_init();
+$token = (new Token)->getToken();
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_XOAUTH2_BEARER, $token);
+curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BEARER);
+
+// Uncomment below to send the Bearer in the Authorization header instead of the
+// options CURLOPT_XOAUTH2_BEARER
+// curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
+
 switch($command) {
 case 'getallusers':
   getUser($ch);
@@ -90,14 +103,8 @@ case 'deleteuser':
 curl_close($ch);
 
 function getUser($ch, $id=null) {
-  if (isset($id))
-    echo "Getting user id $id...\n";
-  else
-    echo "Getting all users...\n";
-
   $endpoint = "http://127.0.0.1:8000/person/" . $id ?? '';
   curl_setopt($ch, CURLOPT_URL, $endpoint);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
   $result = json_decode(curl_exec($ch));
 
@@ -115,7 +122,6 @@ function addUser($ch, $input) {
   $endpoint = "http://127.0.0.1:8000/person/";
   curl_setopt($ch, CURLOPT_URL, $endpoint);
   curl_setopt($ch, CURLOPT_POST, true);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_POSTFIELDS, $input);
   curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
 
@@ -138,7 +144,6 @@ function updateUser($ch, $id, $input) {
   );
   curl_setopt($ch, CURLOPT_URL, $endpoint);
   curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_POSTFIELDS, $input);
   curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
@@ -158,7 +163,6 @@ function deleteUser($ch, $id) {
 
   curl_setopt($ch, CURLOPT_URL, $endpoint);
   curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
   $result = json_decode(curl_exec($ch));
   $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);

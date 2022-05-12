@@ -101,5 +101,5 @@ elif [ "$COMMAND" == "deleteuser" ]; then
     echo ""
 else
     echo "Command not found"
-    echo 'command = getallusers|getuser|adduser|updateuser|deleteuser'
+    echo 'Command = getallusers|getuser|adduser|updateuser|deleteuser'
 fi
