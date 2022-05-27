@@ -74,10 +74,16 @@ function authenticate() {
     if (!isset($matches[1]))
       throw new \Exception('No Bearer Token');
 
+    global $log;
+    preg_match("/\.(.+)\./", $authHeader, $userInfo);
+    if (count($userInfo) > 1)
+      $clientId = json_decode(base64_decode($userInfo[1]))->cid;
+    else
+      return false;
     $jwtVerifier = (new \Okta\JwtVerifier\JwtVerifierBuilder())
       ->setIssuer(getenv('OKTAISSUER'))
       ->setAudience(getenv('OKTAAUDIENCE'))
-      ->setClientId(getenv('OKTACLIENTID'))
+      ->setClientId($clientId)
       ->build();
     return $jwtVerifier->verify($matches[1]);
   } catch (\Exception $e) {

@@ -10,8 +10,8 @@ class PersonController {
 
   public function __construct($db, $requestMethod, $userId) {
     // logger
-    global $log;
-    $this->log = $log;
+    //global $log;
+    //$this->log = $log;
 
     $this->db = $db;
     $this->requestMethod = $requestMethod;
@@ -28,7 +28,6 @@ class PersonController {
         $response = $this->getAllUsers();
       break;
     case 'POST':
-      //$this->log->warning('post', $_POST);
       if (array_key_exists('method', $_POST)) {
         if ($_POST['method'] == 'put')
           $response = $this->updateUser($this->userId);
@@ -61,7 +60,6 @@ class PersonController {
   }
 
   private function getAllUsers() {
-    //$this->log->warning('Ran from getAllUsers');
     $result = $this->personGateway->findAll();
     $response['status_code_header'] = 'HTTP/1.1 200 OK';
     $response['body'] = json_encode($result);
@@ -70,18 +68,14 @@ class PersonController {
 
   private function addUser() {
     $contentType = $_SERVER['HTTP_CONTENT_TYPE'];
-    //$this->log->warning('post', $_POST);
-    //$input = $_POST;
     // https://www.php.net/manual/en/wrappers.php.php#wrappers.php.input
     // data to be sent as json
     // in Postman the body must be raw and JSON
     // in cURL the header is "Content-Type: application/json" and data is json format '{"value": "key"}'
     if (preg_match("/application\/json/", $contentType)) {
       $input = (array) json_decode(file_get_contents('php://input'), TRUE);
-      //$this->log->warning('input', $input);
     } elseif ($contentType == 'application/x-www-form-urlencoded') {
       $input = $_POST;
-      //$this->log->warning('POST', $input);
     } else {
       return $this->unsupportedMedia();
     }
@@ -101,7 +95,6 @@ class PersonController {
     $contentType = $_SERVER['HTTP_CONTENT_TYPE'];
     if (preg_match("/application\/json/", $contentType)) {
       $input = (array) json_decode(file_get_contents('php://input'), TRUE);
-      //$this->log->warning('input', $input);
     } elseif ($contentType == 'application/x-www-form-urlencoded') {
       $input = $_POST;
     } else {

@@ -17,7 +17,7 @@
 # $ ./client.sh adduser '{"firstname": "Dennis", "lastname": "Ritchie", "firstparent_id": 4, "secondparent_id": 3}'
 
 # Update a user by ID:
-# $ ./client.sh updateuser 90 '{"firstname": "Dennis", "lastname": "Ritchie", "firstparent_id": 5, "secondparent_id": 6}
+# $ ./client.sh updateuser 90 '{"firstname": "Dennis", "lastname": "Ritchie", "firstparent_id": 5, "secondparent_id": 6}'
 
 # Delete a user by ID:
 # $ ./client.sh deleteuser 89

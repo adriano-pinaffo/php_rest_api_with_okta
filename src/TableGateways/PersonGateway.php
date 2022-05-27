@@ -6,8 +6,8 @@ class PersonGateway {
 
   public function __construct($db) {
     // logger
-    global $log;
-    $this->log = $log;
+    //global $log;
+    //$this->log = $log;
 
     $this->db = $db;
   }
@@ -37,7 +37,6 @@ class PersonGateway {
   }
 
   public function insert(Array $input) {
-    //$this->log->warning('insert-input', $input);
     $statement = "
     INSERT INTO person
       (firstname, lastname, firstparent_id, secondparent_id)
@@ -60,7 +59,6 @@ class PersonGateway {
   }
 
   public function update($id, Array $input) {
-    //$this->log->warning('update-input', $input);
     $statement = "
     UPDATE person SET
       firstname = :firstname,
