@@ -6,6 +6,7 @@ $ php -S 127.0.0.1:8000 -t public
 
 List all users:
 $ python client.py getallusers
+$ python client.py getuser
 # adjust the prints for the output
 
 List a user ID:
@@ -19,7 +20,7 @@ Update a user by ID:
 $ python client.py updateuser 90 '{"firstname": "Dennis", "lastname": "Ritchie", "firstparent_id": 5, "secondparent_id": 6}
 
 Delete a user by ID:
-$ python client.py deleteuser 89
+$ python client.py deleteuser 7
 """
 
 import requests

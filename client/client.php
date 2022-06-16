@@ -11,7 +11,7 @@
 // adjust the prints for the output
 //
 // To get one user with ID 10:
-// # php client.php getuser 10
+// $ php client.php getuser 10
 // adjust the prints for the output
 //
 // To add a user:

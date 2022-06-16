@@ -7,6 +7,7 @@
 
 # List all users:
 # $ ./client.sh getallusers
+# $ ./client.sh getuser
 # adapt the code with jq (https://stedolan.github.io/jq/) if you need pretty-printing
 
 # List a user ID:
@@ -20,7 +21,7 @@
 # $ ./client.sh updateuser 90 '{"firstname": "Dennis", "lastname": "Ritchie", "firstparent_id": 5, "secondparent_id": 6}'
 
 # Delete a user by ID:
-# $ ./client.sh deleteuser 89
+# $ ./client.sh deleteuser 7
 
 ENV="$1"
 [ ! -f "$ENV" ] && ENV= || shift

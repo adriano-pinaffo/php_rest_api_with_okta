@@ -1,0 +1,24 @@
+Install okta (check more here https://cli.okta.com/)
+$ curl https://raw.githubusercontent.com/okta/okta-cli/master/cli/src/main/scripts/install.sh | bash
+
+Exporting okta PATH (from $HOME)
+$ export PATH=$HOME/bin:$PATH
+
+Register an account (password is chosen after e-mail confirmation)
+$ okta register
+...
+Check your email
+New Okta Account created!
+Your Okta Domain: https://dev-[account ID].okta.com
+
+$ okta apps create service
+Application name [rest_api_oauth2.0]:
+Configuring a new OIDC Application, almost done:
+Created OIDC application, client-id: [application OIDC]
+
+Okta application configuration has been written to: [CWD]/.okta.env
+
+$ cat .okta.env
+export OKTA_OAUTH2_ISSUER="https://dev-[account ID].okta.com/oauth2/default"
+export OKTA_OAUTH2_CLIENT_ID="[client ID]"
+export OKTA_OAUTH2_CLIENT_SECRET="[secret]"
