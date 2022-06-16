@@ -275,8 +275,7 @@ body > div:not([id]) {
       };
       try {
         const proxyFetch = getProxyFetch(clientUrl, options);
-        const result = await proxyFetch()
-        <!--const result = await fetch(clientUrl, options);-->
+        const result = await proxyFetch();
         if (result.ok && result.status >= 200 & result.status < 300) {
           const json = await result.json();
           for ([name, value] of Object.entries(json))
@@ -286,7 +285,7 @@ body > div:not([id]) {
           throw new Error('Could not fetch token. CORS? (' + result['status'] + ' ' + result['statusText'] + ')');
         }
       } catch (err) {
-        divStatus.textContent = err;
+        divStatus.textContent = err + '. Is the proxy running?';
       }
     }
 

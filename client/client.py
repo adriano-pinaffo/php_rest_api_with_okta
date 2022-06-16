@@ -37,7 +37,7 @@ def getUser(id):
     headers = {
         'Authorization': token,
     }
-    resp = requests.get(url, headers=headers, timeout=5)
+    resp = requests.get(url, headers=headers, timeout=10)
     if (not(resp.status_code >= 200 and resp.status_code < 300)):
         print(f'Error: {resp.status_code} ({resp.reason})')
         sys.exit(1)

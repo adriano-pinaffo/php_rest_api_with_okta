@@ -15,7 +15,7 @@ class PersonController {
 
     $this->db = $db;
     $this->requestMethod = $requestMethod;
-    $this->userId = $userId;
+    $this->userId = (int) $userId;
     $this->personGateway = new PersonGateway($db);
   }
 
@@ -75,12 +75,12 @@ class PersonController {
     if (preg_match("/application\/json/", $contentType)) {
       $input = (array) json_decode(file_get_contents('php://input'), TRUE);
     } elseif ($contentType == 'application/x-www-form-urlencoded') {
-      $input = $_POST;
+      $input = $this->$_POST;
     } else {
       return $this->unsupportedMedia();
     }
 
-    $input = $this->adjustInput($input);
+    $input = $this->sanitize($input);
 
     if (!$this->validatePerson($input))
       return $this->unprocessablePerson();
@@ -101,7 +101,7 @@ class PersonController {
       return $this->unsupportedMedia();
     }
 
-    $input = $this->adjustInput($input);
+    $input = $this->sanitize($input);
 
     $result = $this->personGateway->find($id);
     if (!$result)
@@ -133,7 +133,17 @@ class PersonController {
     return $response;
   }
 
-  private function adjustInput($input) {
+  // sanitize useless for this project since input is not displayed back to user, but it is good practice
+  // PDO prepare is used for inputing data to the database
+  private function sanitize($input) {
+    foreach($input as &$item)
+      $item = htmlentities($item);
+    if (!array_key_exists('firstparent_id', $input))
+      $input['firstparent_id'] = '';
+
+    if (!array_key_exists('secondparent_id', $input))
+      $input['secondparent_id'] = '';
+
     $input['firstparent_id'] = $input['firstparent_id'] == '' ? null : (int) $input['firstparent_id'];
     $input['secondparent_id'] = $input['secondparent_id'] == '' ? null : (int) $input['secondparent_id'];
     return $input;
